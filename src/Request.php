@@ -4,6 +4,7 @@ namespace Socodo\Http;
 
 use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Socodo\Http\Enums\HttpMethods;
 use TypeError;
@@ -25,7 +26,7 @@ class Request extends Message implements RequestInterface
      * @param HttpMethods|string $method
      * @param UriInterface|string $uri
      * @param array $headers
-     * @param mixed|null $body
+     * @param StreamInterface|resource|string|null $body
      * @param string $protocolVersion
      */
     public function __construct (HttpMethods|string $method, UriInterface|string $uri, array $headers = [], mixed $body = null, string $protocolVersion = '1.1')
@@ -51,7 +52,11 @@ class Request extends Message implements RequestInterface
             $this->updateHostFromUri();
         }
 
-        if ($body !== '' && $body !== null)
+        if ($body instanceof StreamInterface)
+        {
+            $this->stream = $body;
+        }
+        elseif ($body !== '' && $body !== null)
         {
             $this->stream = new Stream($body);
         }

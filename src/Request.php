@@ -102,17 +102,21 @@ class Request extends Message implements RequestInterface
     /**
      * Get HTTP method.
      *
-     * @param bool $asEnum
-     * @return HttpMethods|string
+     * @return string
      */
-    public function getMethod (bool $asEnum = false): HttpMethods|string
+    public function getMethod (): string
     {
-        if ($asEnum)
-        {
-            return $this->method;
-        }
-
         return $this->method->value;
+    }
+
+    /**
+     * Get HTTP method as enum.
+     *
+     * @return HttpMethods
+     */
+    public function getHttpMethod (): HttpMethods
+    {
+        return $this->method;
     }
 
     /**

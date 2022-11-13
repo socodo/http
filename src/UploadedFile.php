@@ -31,6 +31,59 @@ class UploadedFile implements UploadedFileInterface
     /** @var bool Is the file moved. */
     protected bool $moved = false;
 
+    protected const ERRORS = [
+        UPLOAD_ERR_OK,
+        UPLOAD_ERR_INI_SIZE,
+        UPLOAD_ERR_FORM_SIZE,
+        UPLOAD_ERR_PARTIAL,
+        UPLOAD_ERR_NO_FILE,
+        UPLOAD_ERR_NO_TMP_DIR,
+        UPLOAD_ERR_CANT_WRITE,
+        UPLOAD_ERR_EXTENSION
+    ];
+
+    /**
+     * Constructor.
+     *
+     * @param StreamInterface|resource|string $stream
+     * @param int|null $size
+     * @param int $error
+     * @param string $clientFilename
+     * @param string $clientMediaType
+     */
+    public function __construct (mixed $stream, ?int $size, int $error, string $clientFilename, string $clientMediaType)
+    {
+        if (!in_array($error, self::ERRORS))
+        {
+            throw new InvalidArgumentException('Socodo\\Http\\UploadedFiles::__construct() Argument #3 ($error) must be one of UPLOAD_ERR_*, ' . var_export($error, true) . ' given.');
+        }
+
+        $this->error = $error;
+        $this->size = $size;
+        $this->clientFilename = $clientFilename;
+        $this->clientMediaType = $clientMediaType;
+
+        if ($this->error === UPLOAD_ERR_OK)
+        {
+            if ($stream instanceof StreamInterface)
+            {
+                $this->stream = $stream;
+            }
+            elseif (is_resource($stream))
+            {
+                $this->stream = new Stream($stream);
+            }
+            elseif (is_string($stream))
+            {
+                $this->filePath = $stream;
+            }
+            else
+            {
+                throw new TypeError('Socodo\\Http\\UploadedFile::__constructor() Argument #1 ($stream) must be of type StreamInterface|resource|string, ' . gettype($stream) . ' given.');
+            }
+        }
+    }
+
     /**
      * Get file stream.
      *

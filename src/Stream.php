@@ -23,7 +23,7 @@ class Stream implements StreamInterface
     protected bool $writable;
 
     /** @var ?int Stream size. */
-    protected ?int $size;
+    protected ?int $size = null;
 
     /** @var mixed|null Stream URI. */
     protected mixed $uri;
@@ -54,6 +54,7 @@ class Stream implements StreamInterface
         {
             $resource = fopen('php://temp', 'rw+');
             fwrite($resource, $stream);
+            rewind($resource);
             $stream = $resource;
         }
 

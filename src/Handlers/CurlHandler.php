@@ -6,7 +6,6 @@ use CurlHandle;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Socodo\Http\ClientConfig;
-use Socodo\Http\Interfaces\CookieJarInterface;
 use Socodo\Http\Interfaces\HandlerInterface;
 use Socodo\Http\Response;
 use Socodo\Http\Stream;
@@ -78,7 +77,7 @@ class CurlHandler implements HandlerInterface
             }
             foreach ($config->cookieJar->getCookies() as $key => $val)
             {
-                $cookie[] = $key . '=' . $val;
+                $cookie[] = $key . '=' . $val['value'];
             }
 
             $headers['cookie'] = implode('; ', $cookie);
@@ -94,6 +93,7 @@ class CurlHandler implements HandlerInterface
         }
 
         $config->cookieJar?->setCookies($response->getHeader('set-cookie'));
+        $config->cookieJar?->save();
         return $response;
     }
 

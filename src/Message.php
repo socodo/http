@@ -106,7 +106,7 @@ class Message implements MessageInterface
      * Create an instance with a new header.
      *
      * @param string $name
-     * @param string|null $value
+     * @param string|array<string> $value
      * @return MessageInterface
      */
     public function withHeader ($name, $value): MessageInterface
@@ -126,10 +126,18 @@ class Message implements MessageInterface
             throw $this->createTypeError('withHeader', 2, 'value', 'string|null', gettype($value));
         }
 
-        $value = trim($value, " \t");
-        if (!$this->assertValue($value))
+        if (!is_array($value))
         {
-            throw $this->createMalformedHeaderException('withHeader', 2, 'value', $value);
+            $value = [ $value ];
+        }
+
+        foreach ($value as $i => &$item)
+        {
+            $item = trim($item, " \t");
+            if (!$this->assertValue($item))
+            {
+                throw $this->createMalformedHeaderException('withHeader', 2, 'value[' . $i . ']', $item);
+            }
         }
 
         $normalized = $this->toLowerLatin($name);
@@ -149,7 +157,7 @@ class Message implements MessageInterface
      * Create an instance with an added header.
      *
      * @param string $name
-     * @param string|array<string>|null $value
+     * @param string|array<string> $value
      * @return MessageInterface
      */
     public function withAddedHeader ($name, $value): MessageInterface
